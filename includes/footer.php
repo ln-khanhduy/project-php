@@ -1,59 +1,75 @@
-</div> <!-- Close container -->
+ </div> <!-- Close container -->
 
-<!-- Footer -->
-<footer class="bg-dark text-light mt-5">
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5><i class="fas fa-mobile-alt"></i> PhoneStore</h5>
-                <p>Chuyên cung cấp các sản phẩm điện thoại chính hãng với giá tốt nhất thị trường.</p>
-                <div class="social-links">
-                    <a href="#" class="text-light me-3"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="col-md-2 mb-4">
-                <h6>Liên kết nhanh</h6>
-                <ul class="list-unstyled">
-                    <li><a href="index.php" class="text-light">Trang chủ</a></li>
-                    <li><a href="products.php" class="text-light">Sản phẩm</a></li>
-                    <li><a href="about.php" class="text-light">Giới thiệu</a></li>
-                    <li><a href="contact.php" class="text-light">Liên hệ</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 mb-4">
-                <h6>Chính sách</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-light">Bảo hành</a></li>
-                    <li><a href="#" class="text-light">Đổi trả</a></li>
-                    <li><a href="#" class="text-light">Vận chuyển</a></li>
-                    <li><a href="#" class="text-light">Thanh toán</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 mb-4">
-                <h6>Liên hệ</h6>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-map-marker-alt me-2"></i> 123 Đường ABC, Quận 1, TP.HCM</li>
-                    <li><i class="fas fa-phone me-2"></i> 1800-1234</li>
-                    <li><i class="fas fa-envelope me-2"></i> info@phonestore.com</li>
-                </ul>
-            </div>
-        </div>
-        <hr class="bg-light">
-        <div class="text-center">
-            <p>&copy; 2024 PhoneStore. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
+ <!-- Footer -->
+ <style>
+     body {
+         min-height: 100vh;
+         font-size: 0.95rem;
+         display: flex;
+         flex-direction: column;
+     }
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Khởi tạo tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-</script>
+     footer.site-footer {
+         width: 100%;
+         padding-top: 1rem;
+         padding-bottom: 1rem;
+         margin-top: 2rem;
+     }
+
+     footer.site-footer .container {
+         padding-top: 0.6rem;
+         padding-bottom: 0.6rem;
+     }
+
+     footer.site-footer h6 {
+         font-size: 0.85rem;
+         letter-spacing: 0.05em;
+     }
+ </style>
+
+ <footer class="bg-dark text-light site-footer">
+     <div class="container py-4">
+         <div class="row gy-3">
+             <div class="col-md-4">
+                 <strong class="d-block mb-2">PhoneStore</strong>
+                 <p class="mb-1">Điện thoại chính hãng, bảo hành chính hãng, giao hàng toàn quốc.</p>
+                 <p class="mb-0"><i class="fas fa-map-marker-alt me-1"></i> 123 Phường ABC, Quận 1, TP.HCM</p>
+             </div>
+             <div class="col-md-3">
+                 <h6 class="text-uppercase">Liên kết</h6>
+                 <ul class="list-unstyled mb-0">
+                     <li><a href="index.php" class="text-light">Trang chủ</a></li>
+                     <li><a href="public/login.php" class="text-light">Đăng nhập</a></li>
+                     <li><a href="public/reset_password.php" class="text-light">Đổi mật khẩu</a></li>
+                     <li><a href="public/google_oauth.php" class="text-light">Đăng nhập Gmail</a></li>
+                 </ul>
+             </div>
+             <div class="col-md-3">
+                 <h6 class="text-uppercase">Hỗ trợ</h6>
+                 <ul class="list-unstyled mb-0">
+                     <li><a href="tel:18001234" class="text-light">Hotline: 1800-1234</a></li>
+                     <li><a href="mailto:info@phonestore.com" class="text-light">Email: info@phonestore.com</a></li>
+                     <li><span class="text-light">8h-21h mọi ngày</span></li>
+                 </ul>
+             </div>
+             <div class="col-md-2 text-center text-md-end">
+                 <div class="small mb-2">Kết nối với chúng tôi</div>
+                 <a href="#" class="text-light me-2"><i class="fab fa-facebook"></i></a>
+                 <a href="#" class="text-light me-2"><i class="fab fa-instagram"></i></a>
+                 <a href="#" class="text-light"><i class="fab fa-youtube"></i></a>
+             </div>
+         </div>
+         <hr class="border-secondary my-3">
+         <div class="text-center small mb-0">© <?= date('Y'); ?> PhoneStore. All rights reserved.</div>
+     </div>
+ </footer>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ <script>
+     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+         return new bootstrap.Tooltip(tooltipTriggerEl)
+     });
+ </script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+{
+    "name": "ln-khanhduy/project-php",
+    "require": {
+        "phpmailer/phpmailer": "^7.9"
+    }
+}
