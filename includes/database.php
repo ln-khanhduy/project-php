@@ -1,10 +1,17 @@
 <?php
 class Database {
-    private $host = "localhost";
-    private $db_name = "phone_store";
-    private $username = "root";
-    private $password = "cho2709204";
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct() {
+        $this->host = defined('DB_HOST') ? DB_HOST : 'localhost';
+        $this->db_name = defined('DB_NAME') ? DB_NAME : 'phone_store';
+        $this->username = defined('DB_USER') ? DB_USER : 'root';
+        $this->password = defined('DB_PASS') ? DB_PASS : '';
+    }
 
     public function getConnection() {
         $this->conn = null;

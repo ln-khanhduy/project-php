@@ -1,0 +1,20 @@
+# Environment variables
+.env
+
+# Composer
+/vendor/
+
+# Uploads
+/uploads/*
+!/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
