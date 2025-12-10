@@ -7,7 +7,7 @@ if (file_exists($autoload)) {
 }
 
 if (!defined('MAIL_FROM_EMAIL')) {
-    throw new RuntimeException('MAIL_FROM_EMAIL constant is required for mailing.');
+    throw new RuntimeException('MAIL_FROM_EMAIL không tồn tại');
 }
 
 function send_html_email(string $to, string $subject, string $body): bool {
@@ -48,6 +48,7 @@ function send_html_email_with_phpmailer(string $to, string $subject, string $bod
             $mail->Host = SMTP_HOST;
             $mail->Port = SMTP_PORT;
             $mail->SMTPAutoTLS = false;
+            $mail->SMTPKeepAlive = true;//Giữ kết nối gữi nhanh hơn từ lần gữi thứ 2
             if (!empty(SMTP_ENCRYPTION)) {
                 $mail->SMTPSecure = SMTP_ENCRYPTION;
             }

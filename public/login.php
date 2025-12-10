@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-
 require_once '../config/config.php';
 require_once '../includes/database.php';
+require_once '../models/User.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -13,8 +13,15 @@ if (isset($_SESSION['user_id'])) {
     redirect(SITE_URL . '/public/index.php');
 }
 
-$alertMessage = $_SESSION['auth_error'] ?? '';
-unset($_SESSION['auth_error']);
+$alertType = 'danger';
+if (!empty($_SESSION['reset_success'])) {
+    $alertMessage = $_SESSION['reset_success'];
+    $alertType = 'success';
+    unset($_SESSION['reset_success']);
+} else {
+    $alertMessage = $_SESSION['auth_error'] ?? '';
+    unset($_SESSION['auth_error']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -25,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $database = new Database();
         $db = $database->getConnection();
-        $stmt = $db->prepare('SELECT user_id, full_name, email, password, role, provider, oauth_id FROM users WHERE email = :email LIMIT 1');
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userModel = new User($db);
+        
+        $user = $userModel->findByEmail($email);
 
         if (!$user) {
             $alertMessage = 'Email hoặc mật khẩu không đúng.';
@@ -51,11 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['provider'] = $user['provider'] ?? 'local';
                 $_SESSION['oauth_id'] = $user['oauth_id'] ?? null;
 
-                $countStmt = $db->prepare('SELECT SUM(quantity) FROM cart_items WHERE user_id = :user_id');
-                $countStmt->execute([':user_id' => $user['user_id']]);
-                $_SESSION['cart_count'] = (int)$countStmt->fetchColumn();
+                // Lấy số lượng giỏ hàng từ database
+                $cartStmt = $db->prepare('SELECT SUM(quantity) FROM cart_items WHERE user_id = :user_id');
+                $cartStmt->execute([':user_id' => $user['user_id']]);
+                $_SESSION['cart_count'] = (int)$cartStmt->fetchColumn();
 
-                redirect(SITE_URL . '/public/index.php');
+                if ($_SESSION['role'] === 'admin') {
+                    redirect(SITE_URL . '/public/admin/home.php');
+                } else {
+                    redirect(SITE_URL . '/public/index.php');
+                }
             }
 
             $alertMessage = 'Email hoặc mật khẩu không đúng.';
@@ -73,7 +85,7 @@ require_once '../includes/header.php';
             <div class="card-body p-4">
                 <h2 class="card-title mb-3 text-center">Đăng nhập vào PhoneStore</h2>
                 <?php if (!empty($alertMessage)): ?>
-                    <div class="alert alert-danger">
+                    <div class="alert alert-<?= $alertType; ?>">
                         <?= htmlspecialchars($alertMessage); ?>
                     </div>
                 <?php endif; ?>

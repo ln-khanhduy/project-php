@@ -10,6 +10,12 @@ if (!isLoggedIn()) {
     redirect(SITE_URL . '/public/login.php');
 }
 
+// Chỉ customer mới có đơn hàng
+if ($_SESSION['role'] !== 'customer') {
+    $_SESSION['auth_error'] = 'Chức năng này chỉ dành cho khách hàng.';
+    redirect(SITE_URL . '/public/index.php');
+}
+
 $database = new Database();
 $db = $database->getConnection();
 

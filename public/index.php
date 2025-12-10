@@ -89,7 +89,7 @@ $bannerSlides = [
     SITE_URL . '/uploads/iphone15pro.jpg'
 ];
 
-$searchValue = htmlspecialchars($searchKeyword, ENT_QUOTES);
+$searchValue = htmlspecialchars($searchKeyword, ENT_QUOTES);    
 $minPriceValue = $minPrice !== null ? (string)$minPrice : '';
 $maxPriceValue = $maxPrice !== null ? (string)$maxPrice : '';
 

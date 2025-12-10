@@ -13,8 +13,7 @@ $alertMessage = '';
 $alertType = 'danger';
 $email = '';
 $step = $_POST['step'] ?? 'request';
-$resendRequested = isset($_POST['resend']);
-if ($resendRequested) {
+if (isset($_POST['resend'])) {
     $step = 'request';
 }
 $otpInput = trim($_POST['otp'] ?? '');
@@ -29,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $database = new Database();
             $db = $database->getConnection();
-            $stmt = $db->prepare('SELECT user_id FROM users WHERE email = :email LIMIT 1');
+            $stmt = $db->prepare('SELECT user_id FROM users WHERE email = :email');
             $stmt->execute([':email' => $email]);
             $userId = $stmt->fetchColumn();
 
@@ -60,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $alertMessage = 'Vui lòng điền đầy đủ các trường bao gồm mã OTP.';
         } elseif ($password !== $confirm) {
             $alertMessage = 'Mật khẩu xác nhận không khớp.';
-        } elseif (strlen($password) < 8) {
-            $alertMessage = 'Mật khẩu phải có tối thiểu 8 ký tự.';
+        } elseif (strlen($password) < 6) {
+            $alertMessage = 'Mật khẩu phải có tối thiểu 6 ký tự.';
         } elseif (empty($_SESSION['reset_otp_hash']) || empty($_SESSION['reset_otp_email']) || empty($_SESSION['reset_otp_expires']) || time() > $_SESSION['reset_otp_expires']) {
             $alertMessage = 'Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu lại.';
             $step = 'request';
@@ -72,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $database = new Database();
             $db = $database->getConnection();
-            $stmt = $db->prepare('SELECT user_id FROM users WHERE email = :email LIMIT 1');
+            $stmt = $db->prepare('SELECT user_id FROM users WHERE email = :email');
             $stmt->execute([':email' => $email]);
             $userId = $stmt->fetchColumn();
 
@@ -83,11 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $update = $db->prepare('UPDATE users SET password = :password, provider = NULL, oauth_id = NULL WHERE user_id = :user_id');
                 $update->execute([':password' => $hash, ':user_id' => $userId]);
 
-                $alertType = 'success';
-                $alertMessage = 'Mật khẩu đã được cập nhật. Bạn có thể đăng nhập lại ngay bây giờ.';
                 unset($_SESSION['reset_otp_hash'], $_SESSION['reset_otp_email'], $_SESSION['reset_otp_expires']);
-                $password = $confirm = '';
-                $step = 'request';
+                $_SESSION['reset_success'] = 'Mật khẩu đã được cập nhật thành công. Vui lòng đăng nhập.';
+                header('Location: login.php');
+                exit;
             }
         }
     }

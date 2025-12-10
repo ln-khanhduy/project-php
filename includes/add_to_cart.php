@@ -10,6 +10,12 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Chỉ customer mới có giỏ hàng
+if ($_SESSION['role'] !== 'customer') {
+    echo json_encode(['success' => false, 'message' => 'Chức năng này chỉ dành cho khách hàng.']);
+    exit;
+}
+
 $userId = (int)$_SESSION['user_id'];
 $phoneId = isset($_POST['phone_id']) ? (int)$_POST['phone_id'] : 0;
 $quantity = isset($_POST['quantity']) ? max(1, (int)$_POST['quantity']) : 1;

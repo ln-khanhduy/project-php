@@ -12,6 +12,12 @@ if (!isLoggedIn()) {
     redirect(SITE_URL . '/public/login.php');
 }
 
+// Chỉ customer mới được thanh toán
+if ($_SESSION['role'] !== 'customer') {
+    $_SESSION['auth_error'] = 'Chức năng này chỉ dành cho khách hàng.';
+    redirect(SITE_URL . '/public/index.php');
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect(SITE_URL . '/public/payments.php');
 }

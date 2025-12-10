@@ -1,28 +1,30 @@
 <?php
 require_once '../config/config.php';
 require_once '../includes/database.php';
-require_once '../includes/header.php';
+require_once '../models/Cart.php';
 
 if (!isLoggedIn()) {
     redirect(SITE_URL . '/public/login.php');
 }
 
+// Chỉ customer mới có giỏ hàng
+if ($_SESSION['role'] !== 'customer') {
+    $_SESSION['auth_error'] = 'Chức năng này chỉ dành cho khách hàng.';
+    redirect(SITE_URL . '/public/index.php');
+}
+
 $userId = (int)($_SESSION['user_id'] ?? 0);
 $database = new Database();
 $db = $database->getConnection();
+$cartModel = new Cart($db);
+
+require_once '../includes/header.php';
 
 $message = $_SESSION['cart_message'] ?? '';
 $alertType = $_SESSION['cart_message_type'] ?? 'success';
 unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
-$itemStmt = $db->prepare('SELECT ci.cart_id, ci.quantity, p.phone_id, p.phone_name, p.image_url, p.price, p.stock, b.brand_name
-    FROM cart_items ci
-    JOIN phones p ON ci.phone_id = p.phone_id
-    LEFT JOIN brands b ON p.brand_id = b.brand_id
-    WHERE ci.user_id = :user_id
-    ORDER BY ci.cart_id DESC');
-$itemStmt->execute([':user_id' => $userId]);
-$cartItems = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
+$cartItems = $cartModel->getCartItems($userId);
 
 $totalAmount = 0.0;
 foreach ($cartItems as $item) {

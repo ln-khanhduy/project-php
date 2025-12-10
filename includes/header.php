@@ -50,8 +50,6 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
             border: 1px solid rgba(0, 0, 0, 0.1);
             margin-left: 0.35rem;
         }
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         .product-image {
             width: 100%;
@@ -98,10 +96,6 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
         }
         .header-left .search-form .btn {
             transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-        .header-left .search-form .btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-1px);
         }
         .header-right {
             flex: 1 1 500px;
@@ -153,21 +147,21 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
         <div class="container">
             <div class="header-layout w-100">
                 <div class="header-left">
-                    <a class="navbar-brand" href="index.php">
+                    <a class="navbar-brand" href="/project-php/public/index.php">
                         <i class="fas fa-mobile-alt"></i>
                         <span class="fw-bold">PhoneStore</span>
                     </a>
-                    <form class="search-form" action="search.php" method="GET">
+                    <form class="search-form" action="/project-php/public/products.php" method="GET">
                         <div class="input-group">
-                            <input type="search" class="form-control border-primary" name="q" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm">
-                            <button class="btn btn-primary" type="submit">Tìm</button>
+                            <input type="search" class="form-control border-primary" name="q" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm" required>
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> Tìm</button>
                         </div>
                     </form>
                 </div>
                 <div class="header-right">
                     <ul class="navbar-nav nav-menu">
                         <li class="nav-item">
-                            <a class="nav-link active" href="index.php">Trang chủ</a>
+                            <a class="nav-link active" href="/project-php/public/index.php">Trang chủ</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
@@ -190,10 +184,11 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
                         <li class="nav-item">
                             <a class="nav-link" href="products.php">Tất cả sản phẩm</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="payments.php">Đơn hàng</a>
-                        </li>
                         <?php if(isset($_SESSION['user_id'])): ?>
+                            <?php if($_SESSION['role'] === 'customer'): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="payments.php">Đơn hàng</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="cart.php">
                                     <i class="fas fa-shopping-cart"></i> Giỏ hàng
@@ -202,6 +197,13 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
                                     <?php endif; ?>
                                 </a>
                             </li>
+                            <?php elseif($_SESSION['role'] === 'admin'): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/project-php/public/admin/dashboard.php">
+                                    <i class="fas fa-cog"></i> Quản trị
+                                </a>
+                            </li>
+                            <?php endif; ?>
                         <?php else: ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="login.php">Đăng nhập</a>
@@ -218,14 +220,24 @@ $avatarUrl = $_SESSION['avatar'] ?? null;
                                     <i class="fas fa-user"></i> <?php echo $_SESSION['full_name']; ?>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="profile.php">Hồ sơ</a></li>
-                                    <li><a class="dropdown-item" href="payments.php">Đơn hàng</a></li>
-                                    <?php if($_SESSION['role'] == 'admin'): ?>
+                                    <li><a class="dropdown-item" href="profile.php">
+                                        <i class="fas fa-user-circle"></i> Hồ sơ
+                                    </a></li>
+                                    <?php if($_SESSION['role'] === 'customer'): ?>
+                                    <li><a class="dropdown-item" href="payments.php">
+                                        <i class="fas fa-box"></i> Đơn hàng của tôi
+                                    </a></li>
+                                    <?php endif; ?>
+                                    <?php if($_SESSION['role'] === 'admin'): ?>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="admin/">Quản trị</a></li>
+                                        <li><a class="dropdown-item" href="/project-php/public/admin/dashboard.php">
+                                            <i class="fas fa-tachometer-alt"></i> Quản trị hệ thống
+                                        </a></li>
                                     <?php endif; ?>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+                                    <li><a class="dropdown-item" href="/project-php/public/logout.php">
+                                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                    </a></li>
                                 </ul>
                             </li>
                         <?php endif; ?>

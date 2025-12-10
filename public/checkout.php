@@ -1,33 +1,32 @@
 <?php
 require_once '../config/config.php';
 require_once '../includes/database.php';
-require_once '../includes/header.php';
+require_once '../models/Cart.php';
+require_once '../models/Order.php';
 
 if (!isLoggedIn()) {
     redirect(SITE_URL . '/public/login.php');
 }
 
+// Chỉ customer mới được thanh toán
+if ($_SESSION['role'] !== 'customer') {
+    $_SESSION['auth_error'] = 'Chức năng này chỉ dành cho khách hàng.';
+    redirect(SITE_URL . '/public/index.php');
+}
+
 $userId = (int)($_SESSION['user_id'] ?? 0);
 $database = new Database();
 $db = $database->getConnection();
+$cartModel = new Cart($db);
+$orderModel = new Order($db);
 
-if (!function_exists('fetchCartItems')) {
-    function fetchCartItems(PDO $db, int $userId): array
-    {
-        $stmt = $db->prepare('SELECT ci.cart_item_id, ci.quantity, p.phone_id, p.phone_name, p.price, p.stock
-            FROM cart_items ci
-            JOIN phones p ON ci.phone_id = p.phone_id
-            WHERE ci.user_id = :user_id');
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-}
+require_once '../includes/header.php';
 
 $checkoutMessage = $_SESSION['checkout_message'] ?? '';
 $checkoutStatus = $_SESSION['checkout_status'] ?? 'success';
 unset($_SESSION['checkout_message'], $_SESSION['checkout_status']);
 
-$cartItems = fetchCartItems($db, $userId);
+$cartItems = $cartModel->getCartItems($userId);
 $totalAmount = 0.0;
 foreach ($cartItems as $item) {
     $totalAmount += (float)$item['price'] * (int)$item['quantity'];
@@ -42,14 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $db->beginTransaction();
-        $orderStmt = $db->prepare('INSERT INTO orders (user_id, total_amount, status, order_date)
-            VALUES (:user_id, :total_amount, :status, NOW())');
-        $orderStmt->execute([
-            ':user_id' => $userId,
-            ':total_amount' => $totalAmount,
-            ':status' => 'pending'
+        $orderId = $orderModel->create([
+            'user_id' => $userId,
+            'total_amount' => $totalAmount,
+            'status' => 'pending'
         ]);
-        $orderId = (int)$db->lastInsertId();
 
         $detailStmt = $db->prepare('INSERT INTO order_details (order_id, phone_id, quantity)
             VALUES (:order_id, :phone_id, :quantity)');
@@ -61,9 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
         }
 
-        $deleteStmt = $db->prepare('DELETE FROM cart_items WHERE user_id = :user_id');
-        $deleteStmt->execute([':user_id' => $userId]);
-
+        $cartModel->clearCart($userId);
         $db->commit();
         $_SESSION['cart_count'] = 0;
         $_SESSION['checkout_message'] = 'Đơn hàng #' . $orderId . ' đã được tạo. Vui lòng chọn phương thức thanh toán.';

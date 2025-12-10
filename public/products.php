@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 require_once '../config/config.php';
 require_once '../includes/database.php';
-require_once '../includes/header.php';
+require_once '../models/Phones.php';
 
 $database = new Database();
 $db = $database->getConnection();
+$phoneModel = new Phone($db);
+
+require_once '../includes/header.php';
 
 $perPage = max(20, (int)($_GET['per_page'] ?? 20));
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -61,7 +64,7 @@ try {
 $limitInt = (int)$perPage;
 $offsetInt = (int)$offset;
 
-$listQuery = "SELECT p.*, b.brand_name, c.category_name
+$listQuery = "SELECT p.phone_id, p.brand_id, p.category_id, p.phone_name, p.price, p.stock, p.description, p.image_url, p.created_at, b.brand_name, c.category_name
               FROM phones p
               LEFT JOIN brands b ON p.brand_id = b.brand_id
               LEFT JOIN categories c ON p.category_id = c.category_id
@@ -78,9 +81,8 @@ try {
     $phones = $listStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) {
     $alertError = 'Không thể tải danh sách sản phẩm (truy vấn chính).';
-    // Fallback: lấy 20 sản phẩm mới nhất không lọc để trang không trống
     try {
-        $fallbackSql = "SELECT p.*, b.brand_name, c.category_name
+        $fallbackSql = "SELECT p.phone_id, p.brand_id, p.category_id, p.phone_name, p.price, p.stock, p.description, p.image_url, p.created_at, b.brand_name, c.category_name
                         FROM phones p
                         LEFT JOIN brands b ON p.brand_id = b.brand_id
                         LEFT JOIN categories c ON p.category_id = c.category_id
@@ -121,9 +123,27 @@ if (!function_exists('buildSearchQuery')) {
     }
 }
 ?>
+<style>
+.filter-sidebar {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+.filter-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.filter-sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+.filter-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+</style>
 <div class="row mb-4">
     <div class="col-lg-3 col-md-4 mb-3">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm filter-sidebar">
             <div class="card-body">
                 <h5 class="card-title">Bộ lọc</h5>
                 <form method="get" action="">

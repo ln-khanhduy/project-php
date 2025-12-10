@@ -14,6 +14,7 @@ if (file_exists(__DIR__ . '/../.env')) {
 // Cấu hình cơ bản
 define('SITE_NAME', $_ENV['SITE_NAME'] ?? 'PhoneStore');
 define('SITE_URL', $_ENV['SITE_URL'] ?? 'http://localhost/project-php');
+//define('SITE_URL', $_ENV['SITE_URL'] ?? 'https://doantkweb.infinityfreeapp.com/project-php/'); // deploy thì mở ra
 define('UPLOAD_PATH', $_SERVER['DOCUMENT_ROOT'] . '/phone-store/uploads/');
 define('MAIL_FROM_EMAIL', $_ENV['MAIL_FROM_EMAIL'] ?? 'noreply@phonestore.local');
 define('MAIL_FROM_NAME', SITE_NAME);
@@ -52,6 +53,11 @@ function isLoggedIn() {
 // Hàm kiểm tra admin
 function isAdmin() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+}
+
+// Hàm kiểm tra customer
+function isCustomer() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'customer';
 }
 
 // Hàm format giá
